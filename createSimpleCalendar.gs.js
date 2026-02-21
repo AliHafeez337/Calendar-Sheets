@@ -44,7 +44,7 @@ function createSimpleCalendar() {
     '• "Calendar 2026 (Jul-Dec)" sheet (Jul-Dec)\n\n' +
     'Layout: 2 rows × 3 columns\n' +
     '• 2 column spaces between months\n' +
-    '• Empty rows between each week\n' +
+    '• Extra space between weeks\n' +
     '• Font size 14\n' +
     '• No borders - clean and simple!\n' +
     'Ready to print on 2 A4 pages!', 
@@ -55,11 +55,6 @@ function setupPrintFormatting(sheet) {
   // Set column widths
   for (var i = 1; i <= 27; i++) {
     sheet.setColumnWidth(i, 45);
-  }
-  
-  // Set row heights
-  for (var i = 1; i <= 40; i++) {
-    sheet.setRowHeight(i, 18);
   }
 }
 
@@ -85,7 +80,7 @@ function createMonthGrid(sheet, year, startMonth) {
       
       // Calculate position for this month
       // Each month takes: title row + day headers row + (6 weeks * 2 rows each) = 1 + 1 + 12 = 14 rows
-      var monthStartRow = 1 + (row * 16); // 16 rows per month block (14 rows calendar + 2 empty rows between months)
+      var monthStartRow = 1 + (row * 20); // 20 rows per month block (more space between months)
       var monthStartCol = 1 + (col * 9);   // 9 columns per month (7 days + 2 spacer columns)
       
       // Add month title
@@ -114,7 +109,7 @@ function createMonthGrid(sheet, year, startMonth) {
         dayCell.setBorder(false, false, false, false, false, false);
       }
       
-      // Add empty row after day headers
+      // Add empty row after day headers (more space)
       var emptyRow1 = monthStartRow + 2;
       for (var emptyCol = monthStartCol; emptyCol < monthStartCol + 7; emptyCol++) {
         var emptyCell = sheet.getRange(emptyRow1, emptyCol);
@@ -131,7 +126,7 @@ function createMonthGrid(sheet, year, startMonth) {
       var dayCounter = 1;
       for (var week = 0; week < 6; week++) {
         // Week row
-        var weekRow = monthStartRow + 3 + (week * 2);
+        var weekRow = monthStartRow + 3 + (week * 3); // 3 rows per week (week + 2 empty rows)
         
         for (var day = 0; day < 7; day++) {
           var cellRow = weekRow;
@@ -155,11 +150,21 @@ function createMonthGrid(sheet, year, startMonth) {
           cell.setBorder(false, false, false, false, false, false);
         }
         
-        // Add empty row after each week (except last week)
+        // Add TWO empty rows after each week for extra space (except last week)
         if (week < 5) {
-          var emptyWeekRow = weekRow + 1;
+          // First empty row after week
+          var emptyWeekRow1 = weekRow + 1;
           for (var emptyCol = monthStartCol; emptyCol < monthStartCol + 7; emptyCol++) {
-            var emptyCell = sheet.getRange(emptyWeekRow, emptyCol);
+            var emptyCell = sheet.getRange(emptyWeekRow1, emptyCol);
+            emptyCell.setValue('');
+            emptyCell.setBackground('white');
+            emptyCell.setBorder(false, false, false, false, false, false);
+          }
+          
+          // Second empty row after week
+          var emptyWeekRow2 = weekRow + 2;
+          for (var emptyCol = monthStartCol; emptyCol < monthStartCol + 7; emptyCol++) {
+            var emptyCell = sheet.getRange(emptyWeekRow2, emptyCol);
             emptyCell.setValue('');
             emptyCell.setBackground('white');
             emptyCell.setBorder(false, false, false, false, false, false);
@@ -171,14 +176,14 @@ function createMonthGrid(sheet, year, startMonth) {
       if (col < 2) {
         // First spacer column
         var spacerCol1 = monthStartCol + 7;
-        var spacerRange1 = sheet.getRange(monthStartRow, spacerCol1, 15, 1);
+        var spacerRange1 = sheet.getRange(monthStartRow, spacerCol1, 20, 1);
         spacerRange1.setValue('');
         spacerRange1.setBackground('white');
         spacerRange1.setBorder(false, false, false, false, false, false);
         
         // Second spacer column
         var spacerCol2 = monthStartCol + 8;
-        var spacerRange2 = sheet.getRange(monthStartRow, spacerCol2, 15, 1);
+        var spacerRange2 = sheet.getRange(monthStartRow, spacerCol2, 20, 1);
         spacerRange2.setValue('');
         spacerRange2.setBackground('white');
         spacerRange2.setBorder(false, false, false, false, false, false);
@@ -187,10 +192,10 @@ function createMonthGrid(sheet, year, startMonth) {
       monthCount++;
     }
     
-    // Add two empty rows between month rows
+    // Add FOUR empty rows between month rows for extra space
     if (row === 0) {
-      var emptyRowStart = 16; // After first month block (14 rows + 2)
-      for (var r = 0; r < 2; r++) {
+      var emptyRowStart = 20; // After first month block
+      for (var r = 0; r < 4; r++) {
         var emptyRow = emptyRowStart + r;
         for (var emptyCol = 1; emptyCol <= 27; emptyCol++) {
           var emptyCell = sheet.getRange(emptyRow, emptyCol);
@@ -198,7 +203,7 @@ function createMonthGrid(sheet, year, startMonth) {
           emptyCell.setBackground('white');
           emptyCell.setBorder(false, false, false, false, false, false);
         }
-        sheet.setRowHeight(emptyRow, 12);
+        sheet.setRowHeight(emptyRow, 15);
       }
     }
   }
@@ -217,37 +222,42 @@ function formatCalendar(sheet) {
     allRange.setBorder(false, false, false, false, false, false);
   }
   
-  // Adjust row heights
+  // Adjust row heights with more spacing
   for (var row = 1; row <= lastRow; row++) {
-    // Title rows (1, 17, etc.)
-    if (row === 1 || row === 17) {
-      sheet.setRowHeight(row, 26);
+    // Title rows (1, 21, etc.)
+    if (row === 1 || row === 21) {
+      sheet.setRowHeight(row, 30);
     }
-    // Day header rows (2, 18, etc.)
-    else if (row === 2 || row === 18) {
-      sheet.setRowHeight(row, 22);
+    // Day header rows (2, 22, etc.)
+    else if (row === 2 || row === 22) {
+      sheet.setRowHeight(row, 25);
     }
-    // Empty row after day headers (3, 19, etc.)
-    else if (row === 3 || row === 19) {
-      sheet.setRowHeight(row, 10);
+    // Empty row after day headers (3, 23, etc.)
+    else if (row === 3 || row === 23) {
+      sheet.setRowHeight(row, 15);
     }
-    // Week rows (4,6,8,10,12,14 and 20,22,24,26,28,30)
-    else if ((row >= 4 && row <= 14 && row % 2 === 0) || 
-             (row >= 20 && row <= 30 && row % 2 === 0)) {
-      sheet.setRowHeight(row, 24);
+    // Week rows (4,7,10,13,16,19 and 24,27,30,33,36,39)
+    else if ((row >= 4 && row <= 19 && (row - 4) % 3 === 0) || 
+             (row >= 24 && row <= 39 && (row - 24) % 3 === 0)) {
+      sheet.setRowHeight(row, 28);
     }
-    // Empty rows between weeks (5,7,9,11,13 and 21,23,25,27,29)
-    else if ((row >= 5 && row <= 13 && row % 2 === 1) || 
-             (row >= 21 && row <= 29 && row % 2 === 1)) {
-      sheet.setRowHeight(row, 8);
-    }
-    // Empty rows between month rows (15-16)
-    else if (row === 15 || row === 16) {
+    // First empty row after weeks (5,8,11,14,17 and 25,28,31,34,37)
+    else if ((row >= 5 && row <= 17 && (row - 5) % 3 === 0) || 
+             (row >= 25 && row <= 37 && (row - 25) % 3 === 0)) {
       sheet.setRowHeight(row, 12);
+    }
+    // Second empty row after weeks (6,9,12,15,18 and 26,29,32,35,38)
+    else if ((row >= 6 && row <= 18 && (row - 6) % 3 === 0) || 
+             (row >= 26 && row <= 38 && (row - 26) % 3 === 0)) {
+      sheet.setRowHeight(row, 12);
+    }
+    // Empty rows between month rows (20-23)
+    else if (row >= 20 && row <= 23) {
+      sheet.setRowHeight(row, 15);
     }
     // Any other rows
     else {
-      sheet.setRowHeight(row, 15);
+      sheet.setRowHeight(row, 18);
     }
   }
   
@@ -255,9 +265,9 @@ function formatCalendar(sheet) {
   for (var col = 1; col <= 27; col++) {
     // Check if this is a spacer column (columns 8-9, 17-18, 26-27)
     if (col % 9 === 8 || col % 9 === 0) {
-      sheet.setColumnWidth(col, 10); // Narrow spacer columns
+      sheet.setColumnWidth(col, 15); // Slightly wider spacer columns
     } else {
-      sheet.setColumnWidth(col, 50); // Wider for day columns
+      sheet.setColumnWidth(col, 55); // Even wider for day columns
     }
   }
 }
@@ -280,7 +290,8 @@ function showAbout() {
     '• Page 2: July - December 2026\n' +
     '• Layout: 2 rows × 3 columns\n' +
     '• 2 column spaces between months\n' +
-    '• EMPTY ROWS BETWEEN EACH WEEK\n' +
+    '• EXTRA SPACE between weeks (2 empty rows)\n' +
+    '• EXTRA SPACE between month rows (4 empty rows)\n' +
     '• Font size 14\n' +
     '• NO BORDERS - clean and minimal\n' +
     '• Month names in bold with light blue background\n' +
